@@ -13,9 +13,13 @@ LETTER = """My dearest Tanu,
 Happy Birthday, my love.
 
 Write everything you want to say to her here.
-Tell her why she matters, your favourite memories,
-the little things you love about her, and what you
-hope for her this year.
+Tell her why she matters to you.
+Talk about your favourite memories together.
+Mention the little things you love about her,
+like the way she laughs or how she makes
+ordinary days feel special.
+Tell her what you hope for her this year.
+Say thank you for being exactly who she is.
 
 Forever yours,
 [Your name] ❤️
@@ -24,7 +28,7 @@ Forever yours,
 st.set_page_config(
     page_title="Happy Birthday Tanu ❤️",
     page_icon="❤️",
-    layout="centered",
+    layout="wide",
 )
 
 if "page" not in st.session_state:
@@ -148,18 +152,18 @@ GIFT_TEMPLATE = """
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; background: transparent; font-family: 'Dancing Script', cursive; }
-  #stage { position: relative; width: 100%; min-height: 1500px; padding: 30px 12px 60px; overflow: hidden; }
+  #stage { position: relative; width: 100%; padding: 30px 12px 60px; overflow: hidden; }
+  #stage.narrow { padding-top: 130px; padding-bottom: 150px; }
 
   .letter {
-    position: relative; z-index: 1; max-width: 760px; margin: 0 auto;
-    background: #fffaf3; border-radius: 6px; padding: 56px 48px 64px;
+    position: relative; z-index: 1; width: 100%; max-width: 620px; margin: 0 auto;
+    background: #fffaf3; border-radius: 6px; padding: 44px 40px 52px;
     box-shadow: 0 20px 50px rgba(120, 20, 50, 0.28);
-    background-image: repeating-linear-gradient(transparent 0, transparent 53px, #f3d9df 54px);
-    background-position: 0 56px;
   }
-  .letter h1 { font-family: 'Pacifico', cursive; color: #b0124a; font-size: 2.2rem; margin: 0 0 26px; font-weight: 400; }
+  .letter h1 { font-family: 'Pacifico', cursive; color: #b0124a; font-size: 1.9rem; margin: 0 0 18px; font-weight: 400; }
   .letter .body {
-    white-space: pre-wrap; color: #4a1f2e; font-size: 2.1rem; line-height: 54px; font-weight: 600;
+    white-space: pre-wrap; color: #4a1f2e; font-size: 1.45rem; line-height: 38px; font-weight: 600;
+    background-image: repeating-linear-gradient(transparent 0, transparent 37px, #f3d9df 38px);
   }
 
   #hearts { position: absolute; inset: 0; z-index: 5; pointer-events: none; perspective: 700px; }
@@ -201,9 +205,8 @@ GIFT_TEMPLATE = """
   }
 
   @media (max-width: 600px) {
-    .letter { padding: 36px 22px 44px; }
-    .letter .body { font-size: 1.65rem; line-height: 46px; }
-    .letter { background-image: repeating-linear-gradient(transparent 0, transparent 45px, #f3d9df 46px); background-position: 0 50px; }
+    .letter { padding: 30px 20px 38px; }
+    .letter .body { font-size: 1.25rem; line-height: 33px; background-image: repeating-linear-gradient(transparent 0, transparent 32px, #f3d9df 33px); }
   }
   @media (prefers-reduced-motion: reduce) { .heart { animation: pop .3s both; } }
 </style>
@@ -238,18 +241,49 @@ GIFT_TEMPLATE = """
 
   const rand = (a, b) => a + Math.random() * (b - a);
 
+  // Where hearts are allowed: the empty space beside the letter,
+  // or above/below it when the screen is too narrow for side gutters.
+  function zones() {
+    const lr = layer.getBoundingClientRect();
+    const r = document.querySelector('.letter').getBoundingClientRect();
+    const L = r.left - lr.left, R = r.right - lr.left, T = r.top - lr.top, B = r.bottom - lr.top;
+    const W = layer.clientWidth, H = layer.clientHeight;
+    const gutter = Math.min(L, W - R);
+    if (gutter >= 90) {
+      return {
+        narrow: false,
+        list: [
+          { x1: 8, x2: L - 12, y1: 20, y2: H - 20 },
+          { x1: R + 12, x2: W - 8, y1: 20, y2: H - 20 },
+        ],
+      };
+    }
+    return {
+      narrow: true,
+      list: [
+        { x1: 8, x2: W - 8, y1: 12, y2: T - 12 },
+        { x1: 8, x2: W - 8, y1: B + 12, y2: H - 12 },
+      ],
+    };
+  }
+
+  let nextSide = 0;
   function spawnHeart() {
-    const size = rand(60, 92);
-    const w = layer.clientWidth, h = layer.clientHeight;
+    const z = zones();
+    stage.classList.toggle('narrow', z.narrow);
+    const zone = z.list[nextSide++ % z.list.length];
+    const zw = zone.x2 - zone.x1, zh = zone.y2 - zone.y1;
+    const size = Math.max(36, Math.min(rand(58, 86), zw - 4, zh - 4));
     const el = document.createElement('div');
     el.className = 'heart';
     el.style.width = size + 'px';
     el.style.height = size * 0.9 + 'px';
-    el.style.left = rand(8, Math.max(20, w - size - 8)) + 'px';
-    el.style.top  = rand(20, Math.max(40, h - size - 20)) + 'px';
-    el.innerHTML = heartSVG.replace(/id="g"/, 'id="g' + Math.random().toString(36).slice(2) + '"');
+    el.style.left = rand(zone.x1, Math.max(zone.x1, zone.x2 - size)) + 'px';
+    el.style.top  = rand(zone.y1, Math.max(zone.y1, zone.y2 - size)) + 'px';
+    el.innerHTML = heartSVG;
     // give each heart its own gradient id so they never clash
-    const gid = el.querySelector('radialGradient').id;
+    const gid = 'g' + Math.random().toString(36).slice(2);
+    el.querySelector('radialGradient').id = gid;
     el.querySelector('path').setAttribute('fill', 'url(#' + gid + ')');
     el.addEventListener('click', () => explode(el));
     layer.appendChild(el);
@@ -292,7 +326,10 @@ GIFT_TEMPLATE = """
     setTimeout(spawnHeart, 900);
   }
 
-  for (let i = 0; i < HEART_COUNT; i++) setTimeout(spawnHeart, i * 150);
+  window.addEventListener('load', () => {
+    stage.classList.toggle('narrow', zones().narrow);
+    for (let i = 0; i < HEART_COUNT; i++) setTimeout(spawnHeart, 150 + i * 150);
+  });
 </script>
 </body>
 </html>
@@ -302,7 +339,10 @@ GIFT_TEMPLATE = """
 def gift_page():
     letter_html = html.escape(LETTER.strip("\n"))
     page = GIFT_TEMPLATE.replace("__LETTER__", letter_html)
-    components.html(page, height=1500, scrolling=True)
+    # estimate height from the letter length (about 40 characters per line)
+    lines = sum(max(1, -(-len(line) // 40)) for line in LETTER.strip("\n").split("\n"))
+    height = max(760, 260 + lines * 38 + 300)
+    components.html(page, height=height, scrolling=True)
 
     if st.button("⬅ back"):
         st.session_state.page = "home"
