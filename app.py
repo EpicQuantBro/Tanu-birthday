@@ -125,20 +125,31 @@ def home_page():
             font-size: clamp(2.6rem, 9vw, 5.2rem);
             line-height: 1.2; color: #b0124a;
             margin: 22vh 0 2.5rem 0;
+            text-align: left;
             text-shadow: 0 4px 0 #fff, 0 10px 24px rgba(176, 18, 74, 0.35);
         }}
-        div.stButton {{ position: relative; z-index: 2; }}
+        /* title + button share one shrink-to-fit box, so the button's left edge = the "H" */
+        .st-key-hero {{
+            position: relative; z-index: 2;
+            width: fit-content; max-width: 100%;
+            margin: 0 auto; align-items: flex-start;
+        }}
+        .st-key-hero div.stButton {{ justify-content: flex-start; }}
         @media (prefers-reduced-motion: reduce) {{ .balloon {{ animation: none; bottom: 20vh; }} }}
         </style>
         <div class="balloon-layer">{balloons}</div>
-        <div class="hb-title">Happy Birthday Tanu ❤️</div>
         """,
         unsafe_allow_html=True,
     )
 
-    if st.button("click here for a smol lil gift 🎁"):
-        st.session_state.page = "gift"
-        st.rerun()
+    with st.container(key="hero"):
+        st.markdown(
+            '<div class="hb-title">Happy Birthday Tanu ❤️</div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("click here for a smol lil gift 🎁"):
+            st.session_state.page = "gift"
+            st.rerun()
 
 
 # ─────────────────────────────────────────────────────────────
