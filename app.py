@@ -10,19 +10,21 @@ import streamlit.components.v1 as components
 # ─────────────────────────────────────────────────────────────
 LETTER = """My dearest Tanu,
 
-Happy Birthday, my love.
+Happy Birthday my love.
 
-Write everything you want to say to her here.
-Tell her why she matters to you.
-Talk about your favourite memories together.
-Mention the little things you love about her,
-like the way she laughs or how she makes
-ordinary days feel special.
-Tell her what you hope for her this year.
-Say thank you for being exactly who she is.
+I want you to have this little letter to be able to 
+read whenever as a lil thing I coded. It's been 
+far too long since we've seen each other and it feels 
+like forever more. But I know that first hug and kiss, 
+releasing months of pent up missing each other tension
+is gonna be so nice. So nice. I know today wasn't the 
+birthday you imagined, even with the circumstances. 
+but I hope this little burst of mildly annoying pink 
+can brighten it up a bit. 
 
-Forever yours,
-[Your name] ❤️
+P.S. you can click the hearts on the side. Try it.
+Love, 
+Your husband ❤️
 """
 
 st.set_page_config(
